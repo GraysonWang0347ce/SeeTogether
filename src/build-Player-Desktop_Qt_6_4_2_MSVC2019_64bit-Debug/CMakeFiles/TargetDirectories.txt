@@ -1,0 +1,8 @@
+E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/Player.dir
+E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/edit_cache.dir
+E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/rebuild_cache.dir
+E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/list_install_components.dir
+E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/install.dir
+E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/install/local.dir
+E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/Player_autogen_timestamp_deps.dir
+E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/Player_autogen.dir

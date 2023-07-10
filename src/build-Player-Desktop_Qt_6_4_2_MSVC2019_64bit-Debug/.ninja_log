@@ -1,0 +1,10 @@
+# ninja log v5
+3	23	0	E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/CMakeFiles/cmake.verify_globs	bd33f79bdf1b66e4
+26	483	7107042637044285	Player_autogen/timestamp	d2ed4a09f0370eb7
+26	483	7107042637044285	Player_autogen/mocs_compilation.cpp	d2ed4a09f0370eb7
+26	483	7107042637044285	E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/Player_autogen/timestamp	d2ed4a09f0370eb7
+26	483	7107042637044285	E:/Player/src/build-Player-Desktop_Qt_6_4_2_MSVC2019_64bit-Debug/Player_autogen/mocs_compilation.cpp	d2ed4a09f0370eb7
+490	1964	7107042654186720	CMakeFiles/Player.dir/Player_autogen/mocs_compilation.cpp.obj	fd05be56fc3ea646
+496	1968	7107042654216718	CMakeFiles/Player.dir/mainwindow.cpp.obj	8d21adf0bbe3f47d
+493	1969	7107042654216718	CMakeFiles/Player.dir/main.cpp.obj	473ce117b39a1a02
+1969	2276	7107042657176705	Player.exe	24567a812d15c17d
