@@ -14,7 +14,7 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
+# *.dll
 
 # Fortran module files
 *.mod
@@ -23,10 +23,18 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
-*.lib
+# *.a
+# *.lib
 
 # Executables
-*.exe
-*.out
-*.app
+#*.exe
+#*.out
+#*.app
+
+# ffmpeg libraries and include
+/include/ffmpeg/
+/lib/ffmpeg/
+/bin/
+/build/
+/src/ctogether_vs/x64/debug/
+/src/ctogether_vs/.vs/
