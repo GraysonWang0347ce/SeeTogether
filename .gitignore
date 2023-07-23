@@ -36,5 +36,8 @@
 /lib/ffmpeg/
 /bin/
 /build/
-/src/ctogether/x64/debug/
+/src/ctogether/x64/
 /src/ctogether/.vs/
+/src/ctogether/debug/
+/src/ctogether/release/
+/src/x64/

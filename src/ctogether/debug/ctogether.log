@@ -1,1 +1,12 @@
-﻿
+﻿  Reading Qt configuration (E:/Qt/6.4.2/msvc2019_64/bin/qmake)
+  Generate moc_predefs.h
+C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(248,5): warning MSB8064: 项“debug\moc_predefs.h.cbt”的自定义生成成功，但指定的依赖项“e:\player\src\ctogether\debug\moc_predefs.h.cbt”不存在。这可能会导致增量生成无法正常工作。
+  Moc'ing mainwindow.h...
+  demux.cpp
+  main.cpp
+  mainwindow.cpp
+  single_core.cpp
+demux.cpp(17,6): warning C4189: “nb_video”: 局部变量已初始化但不引用
+demux.cpp(15,6): warning C4189: “ret”: 局部变量已初始化但不引用
+  moc_mainwindow.cpp
+  ctogether.vcxproj -> E:\Player\src\ctogether\debug\ctogether.exe
