@@ -9,12 +9,14 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    decode.cpp \
     demux.cpp \
     main.cpp \
     mainwindow.cpp \
     single_core.cpp
 
 HEADERS += \
+    decode.h \
     demux.h \
     mainwindow.h \
     single_core.h
