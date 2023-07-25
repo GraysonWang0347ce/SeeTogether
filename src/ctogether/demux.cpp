@@ -1,6 +1,7 @@
 #include"mainwindow.h"
 #include"single_core.h"
 #include"demux.h"
+#include"av_queues.h"
 
 /*
 * @author Grayson_Wang
@@ -12,11 +13,13 @@
 		video and audio
 		4. demuxing
 */
-int ct_demux(single_core* core_ptr)
+int ct_demux(single_core* core_ptr , av_queues* queues)
 {
 	// TODO: to preserve multiple video&audio stream, use vector later
 	static int idx_video_stream = -1;
 	static int idx_audio_stream = -1;
+	int ret = 0;
+
 
 	//return number, 0 on success or enum CT_ERROR
 	int ret_num = 0;
@@ -39,7 +42,7 @@ int ct_demux(single_core* core_ptr)
 	const char* path = "D:\\Documents\\classInfoAssistant\\Ad\\ad.mp4";
 
 	// open input from a given url
-	int ret = avformat_open_input(&ptr_fmt, path, NULL, NULL);
+    ret = avformat_open_input(&ptr_fmt, path, NULL, NULL);
 
 	// get stream info
 	avformat_find_stream_info(ptr_fmt, nullptr);
@@ -75,32 +78,84 @@ int ct_demux(single_core* core_ptr)
 		goto _OUT;
 	}
 
+	// BELOW are operates  initializing AVCodex-related data structures 
+			// get the video codec according to stream info
+			core_ptr->ptr_stream_video = ptr_fmt->streams[idx_video_stream];
+			core_ptr->ptr_stream_audio = ptr_fmt->streams[idx_audio_stream];
+
+			core_ptr->ptr_VideoCodec = avcodec_find_decoder(core_ptr->ptr_stream_video
+																														->codecpar->codec_id);
+			core_ptr->ptr_AudioCodec = avcodec_find_decoder(core_ptr->ptr_stream_audio
+																														->codecpar->codec_id);
+
+			if (!core_ptr->ptr_VideoCodec &&  !core_ptr->ptr_AudioCodec)
+			{
+				ret_num = NO_CODEC_FOUND;
+				goto _OUT;
+			}
+
+			// allocate codec context
+			core_ptr->ptr_video_codec_ctx = avcodec_alloc_context3(core_ptr->ptr_VideoCodec);
+			core_ptr->ptr_audio_codec_ctx = avcodec_alloc_context3(core_ptr->ptr_AudioCodec);
+
+			// copy codec parameters to codec context
+			ret = avcodec_parameters_to_context(core_ptr->ptr_video_codec_ctx,
+																				core_ptr->ptr_stream_video->codecpar);
+			if (ret < 0)
+			{
+				ret_num = VIDEOCODEC_PARAM_COPY_FAILED;
+				goto _OUT;
+			}
+			ret = avcodec_parameters_to_context(core_ptr->ptr_audio_codec_ctx,
+																				core_ptr->ptr_stream_audio->codecpar);
+			if (ret < 0)
+			{
+				ret_num = VIDEOCODEC_PARAM_COPY_FAILED;
+				goto _OUT;
+			}
+			// bind codec to codec context
+			ret = avcodec_open2(core_ptr->ptr_video_codec_ctx,
+												core_ptr->ptr_VideoCodec,nullptr);
+			if (ret < 0)
+			{
+				ret_num = VIDEOCODEC_BIND_FAILED;
+				goto _OUT;
+			}
+			ret = avcodec_open2(core_ptr->ptr_audio_codec_ctx,
+														core_ptr->ptr_AudioCodec,nullptr);
+			if (ret < 0)
+			{
+				ret_num = AUDIOCODEC_BIND_FAILED;
+				goto _OUT;
+			}
+	 // ABOVE are operates  initializing AVCodex-related data structures 
+
 	// demuxing
 	while (!av_read_frame(ptr_fmt, ptr_packet))
 	{
 		if (ptr_packet->stream_index == idx_video_stream)
 		{
 			// if video packet's size > __MAX__QUEUE_LEN__ definded, then wait
-			while (core_ptr->video_packet_queue.size() >= __MAX_QUEUE_LEN__);
+			while (queues->ct_is_queue_full(queues->video_packet_queue));
 
 			// push video packet into queue
-			core_ptr->video_packet_queue.push_back(ptr_packet);
+			queues->ct_queue_pshback(queues->video_packet_queue,ptr_packet);
 
 			// notify video thread to decode
-			core_ptr->video_packet_cv.notify_one();
+			queues->video_packet_cv.notify_all();
 			
 			/*break;*/
 		}
 		else if (ptr_packet->stream_index == idx_audio_stream)
 		{
 			// if audio packet's size > __MAX__QUEUE_LEN__ definded, then wait
-			while (core_ptr->audio_packet_queue.size() >= __MAX_QUEUE_LEN__);
+			while (queues->ct_is_queue_full(queues->audio_packet_queue));
 
 			// push audio packet into queue
-			core_ptr->audio_packet_queue.push_back(ptr_packet);
+			queues->ct_queue_pshback(queues->audio_packet_queue, ptr_packet);
 
 			// notify audio thread to decode
-			core_ptr->audio_packet_cv.notify_one();
+			queues->audio_packet_cv.notify_all();
 		}
 		// TODO: preserved for AVMEDIATYPE_SUBTITLE or so
 		//else if(){}
@@ -123,4 +178,5 @@ int ct_demux(single_core* core_ptr)
 	{
 		av_packet_free(&ptr_packet);
 	}
+	return ret_num;
 }

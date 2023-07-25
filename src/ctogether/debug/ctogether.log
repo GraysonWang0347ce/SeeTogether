@@ -1,8 +1,4 @@
 ﻿  Generate moc_predefs.h
 C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(248,5): warning MSB8064: 项“debug\moc_predefs.h.cbt”的自定义生成成功，但指定的依赖项“e:\player\src\ctogether\debug\moc_predefs.h.cbt”不存在。这可能会导致增量生成无法正常工作。
-  demux.cpp
   main.cpp
-  single_core.cpp
-demux.cpp(45,20): warning C4018: “<”: 有符号/无符号不匹配
-demux.cpp(39,6): warning C4189: “ret”: 局部变量已初始化但不引用
   ctogether.vcxproj -> E:\Player\src\ctogether\debug\ctogether.exe

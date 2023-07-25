@@ -3,6 +3,7 @@
 #define __DEMUX__
 #include"mainwindow.h"
 #include"single_core.h"
+#include"av_queues.h"
 
 /*
 * @author Grayson_Wang
@@ -13,8 +14,9 @@
 		3. find proper stream index for
 		video and audio
 		4. demuxing
+	@return 0 on success or enum CT_ERROR(in single_core.h)
 */
-extern int ct_demux(single_core* core_ptr);
+extern int ct_demux(single_core* core_ptr, av_queues* queues);
 
 #endif // !__DEMUX__
 

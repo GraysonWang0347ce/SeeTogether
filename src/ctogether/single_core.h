@@ -9,8 +9,6 @@
 /*
 	Preprocessing
 */
-// max queue length for all queues
-#define __MAX_QUEUE_LEN__ 1024
 
 /* A singleton class for ffmpeg - related data - structures 
  *  to storage and initialize. 
@@ -25,31 +23,18 @@ public:
 	single_core& operator=(single_core& other) = delete;
 
 public:
+	// compulsory data structures for ffmpeg
 	AVFormatContext* ptr_FmtCtx;
 	AVCodecContext* ptr_VideoCodecCtx;
-	AVStream* ptr_stream;
+	AVStream* ptr_stream_video;
+	AVStream* ptr_stream_audio;
 	AVPacket* ptr_packet;
 	AVFrame* ptr_frame;
+	const AVCodec* ptr_VideoCodec;
+	const AVCodec* ptr_AudioCodec;
+	AVCodecContext* ptr_video_codec_ctx;
+	AVCodecContext* ptr_audio_codec_ctx;
 
-
-	// queues for video and audio packets
-	std::deque<AVPacket*> video_packet_queue;
-	std::deque<AVPacket*> audio_packet_queue;
-
-	std::deque<AVFrame*> video_frame_queue;
-	std::deque<AVFrame*> audio_frame_queue;
-
-
-	// locks and condition variables for synchronizing queues
-	std::condition_variable video_packet_cv;
-	std::condition_variable video_frame_cv;
-	std::condition_variable audio_packet_cv;
-	std::condition_variable audio_frame_cv;
-
-	std::mutex video_packet_mutex;
-	std::mutex video_frame_mutex;
-	std::mutex audio_packet_mutex;
-	std::mutex audio_frame_mutex;
 
 private:
 	single_core() {};
@@ -59,6 +44,11 @@ private:
 
 enum CT_ERROR {
 	NO_TRACK_FOUND=1, // cannot find any video or audio track due to given url
+	NO_CODEC_FOUND, // cannot find any video or audio codec due to given filmlet format
+	VIDEOCODEC_PARAM_COPY_FAILED, // cannot copy video codec parameters to codec context
+	AUDIOCODEC_PARAM_COPY_FAILED, // cannot copy audio codec parameters to codec context
+	VIDEOCODEC_BIND_FAILED, // cannot bind video codec to codec context
+	AUDIOCODEC_BIND_FAILED, // cannot bind audio codec to codec context
 
 };
 
