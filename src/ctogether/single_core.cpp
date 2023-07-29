@@ -8,7 +8,6 @@ single_core::~single_core()
 	if (ptr_FmtCtx)avformat_free_context(ptr_FmtCtx);
 	if(ptr_frame)av_frame_free(&ptr_frame);
 	if(ptr_packet)av_packet_free(&ptr_packet);
-	if(ptr_VideoCodecCtx)avcodec_free_context(&ptr_VideoCodecCtx);
 }
 
 // Initialize the ffmpeg data structures

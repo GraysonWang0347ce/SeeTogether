@@ -113,6 +113,17 @@ int ct_demux(single_core* core_ptr , av_queues* queues)
 				ret_num = VIDEOCODEC_PARAM_COPY_FAILED;
 				goto _OUT;
 			}
+
+			// set thread count
+			core_ptr->ptr_video_codec_ctx->thread_count = 8;
+			core_ptr->ptr_audio_codec_ctx->thread_count = 8;
+
+			if (core_ptr->ptr_VideoCodec->id == AV_CODEC_ID_H264)
+			{
+				av_opt_set(core_ptr->ptr_video_codec_ctx->priv_data,"preset", "slow", 0);
+				av_opt_set(core_ptr->ptr_video_codec_ctx->priv_data,"tune", "zerolatency", 0);
+			}
+
 			// bind codec to codec context
 			ret = avcodec_open2(core_ptr->ptr_video_codec_ctx,
 												core_ptr->ptr_VideoCodec,nullptr);
@@ -135,11 +146,11 @@ int ct_demux(single_core* core_ptr , av_queues* queues)
 	{
 		if (ptr_packet->stream_index == idx_video_stream)
 		{
-			// if video packet's size > __MAX__QUEUE_LEN__ definded, then wait
+			// if video packet's size > __MAX__QUEUE_LEN__ defined, then wait
 			while (queues->ct_is_queue_full(queues->video_packet_queue));
 
 			// push video packet into queue
-			queues->ct_queue_pshback(queues->video_packet_queue,ptr_packet);
+			queues->ct_queue_pshback_v(queues->video_packet_queue,ptr_packet);
 
 			// notify video thread to decode
 			queues->video_packet_cv.notify_all();
@@ -148,11 +159,11 @@ int ct_demux(single_core* core_ptr , av_queues* queues)
 		}
 		else if (ptr_packet->stream_index == idx_audio_stream)
 		{
-			// if audio packet's size > __MAX__QUEUE_LEN__ definded, then wait
+			// if audio packet's size > __MAX__QUEUE_LEN__ defined, then wait
 			while (queues->ct_is_queue_full(queues->audio_packet_queue));
 
 			// push audio packet into queue
-			queues->ct_queue_pshback(queues->audio_packet_queue, ptr_packet);
+			queues->ct_queue_pshback_a(queues->audio_packet_queue, ptr_packet);
 
 			// notify audio thread to decode
 			queues->audio_packet_cv.notify_all();
@@ -161,7 +172,7 @@ int ct_demux(single_core* core_ptr , av_queues* queues)
 		//else if(){}
 		else
 		{
-			// if packet is not like above, then free it
+
 			av_packet_unref(ptr_packet);
 		}
 	}

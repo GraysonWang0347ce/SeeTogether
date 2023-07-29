@@ -20,6 +20,7 @@ HEADERS += \
     av_queues.h \
     decode.h \
     demux.h \
+    error.h \
     mainwindow.h \
     single_core.h
 

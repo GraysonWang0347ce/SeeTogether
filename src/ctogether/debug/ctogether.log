@@ -1,4 +1,8 @@
 ﻿  Generate moc_predefs.h
 C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(248,5): warning MSB8064: 项“debug\moc_predefs.h.cbt”的自定义生成成功，但指定的依赖项“e:\player\src\ctogether\debug\moc_predefs.h.cbt”不存在。这可能会导致增量生成无法正常工作。
-  main.cpp
+  decode.cpp
+decode.cpp(47,1): warning C4102: “_OUT”: 未引用的标签
+decode.cpp(72,18): warning C4189: “codec_audio”: 局部变量已初始化但不引用
+decode.cpp(73,19): warning C4189: “codec_ctx_audio”: 局部变量已初始化但不引用
+E:\Player\src\ctogether\av_queues.h(90): warning C4172: 返回局部变量或临时变量的地址: temp
   ctogether.vcxproj -> E:\Player\src\ctogether\debug\ctogether.exe

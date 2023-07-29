@@ -7,7 +7,7 @@
 #include<condition_variable>
 #include<mutex>
 
-#define __MAX_QUEUE_LEN__ 1024
+#define __MAX_QUEUE_LEN__ 128
 
 class av_queues
 {
@@ -35,37 +35,78 @@ public:
 	std::mutex audio_frame_mutex;
 
 	template <class T>
-	bool ct_is_queue_full(std::deque<T> queue)
+	bool ct_is_queue_full(std::deque<T>& queue) const
 	{
 		return queue.size() >= __MAX_QUEUE_LEN__;
 	}
 
 	template <class T>
-	bool ct_is_queue_empty(std::deque<T> queue)
+	bool ct_is_queue_empty(std::deque<T>& queue) const
 	{
 		return queue.empty();
 	}
 
-	template <class T>
-	void ct_queue_pshback(std::deque<T> queue, T element)
+
+	inline void ct_queue_pshback_v(std::deque<AVPacket*>& queue, AVPacket* element)
 	{
-		queue.push_back(element);
+		AVPacket* temp = av_packet_clone(element);
+		video_packet_mutex.lock();
+		queue.emplace_back((AVPacket*)temp);
+		video_packet_mutex.unlock();
+		return;
+	}
+
+	inline void ct_queue_pshback_v(std::deque<AVFrame*>& queue, AVFrame* element)
+	{
+		AVFrame* temp = av_frame_clone(element);
+		video_frame_mutex.lock();
+		queue.emplace_back((AVFrame*)temp);
+		video_frame_mutex.unlock();
+		return;
+	}
+
+	inline void ct_queue_pshback_a(std::deque<AVPacket*>& queue, AVPacket* element)
+	{
+		AVPacket* temp = av_packet_clone(element);
+		audio_packet_mutex.lock();
+		queue.emplace_back((AVPacket*)temp);
+		audio_packet_mutex.unlock();
+		return;
+	}
+
+	inline void ct_queue_pshback_a(std::deque<AVFrame*>& queue, AVFrame* element)
+	{
+		AVFrame* temp = av_frame_clone(element);
+		audio_frame_mutex.lock();
+		queue.emplace_back((AVFrame*)temp);
+		audio_frame_mutex.unlock();
+		return;
 	}
 
 	template <class T>
-	T ct_queue_front(std::deque<T> queue) const
+	T& ct_queue_front(std::deque<T>& queue) 
 	{
-		return queue.front();
+		auto temp = queue.front();
+		return temp;
+	}
+
+
+	void ct_queue_popfront(std::deque<AVPacket*>& queue)
+	{
+		av_packet_free(&queue.front());
+		queue.pop_front();
+		return;
+	}
+
+	void ct_queue_popfront(std::deque<AVFrame*>& queue)
+	{
+		av_frame_free(&queue.front());
+		queue.pop_front();
+		return;
 	}
 
 	template <class T>
-	T ct_queue_popfront(std::deque<T> queue)
-	{
-		return queue.pop_front();
-	}
-
-	template <class T>
-	size_t ct_queue_getlength(std::deque<T> queue)
+	size_t ct_queue_getlength(std::deque<T>& queue)
 	{
 		return queue.size();
 	}
