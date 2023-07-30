@@ -35,6 +35,7 @@ public:
 	AVCodecContext* ptr_video_codec_ctx;
 	AVCodecContext* ptr_audio_codec_ctx;
 
+	SwsContext* ptr_sws_ctx;
 
 private:
 	single_core() {};

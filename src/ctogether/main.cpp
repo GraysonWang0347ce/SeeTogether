@@ -17,13 +17,15 @@ int main(int argc, char* argv[])
 	/* TEST CODES HERE TO BE ARCHIVED*/
 	single_core* core_ptr = single_core::get_instance();
 	av_queues* queues = new av_queues();
-	
+	auto decode = ct_decode();
+
 	std::thread demux(ct_demux,core_ptr,queues);
-	std::thread decode_video(ct_decode_video, core_ptr, queues);
-	demux.join();
-	decode_video.join();
+	std::thread decode_video(&ct_decode::ct_decode_video,&decode, core_ptr, queues);
+	demux.detach();
+	decode_video.detach();
 
 	
+
 	//avformat_free_context(ptr_fmt);
 
 	/* TEST CODES HERE TO BE ARCHIVED*/

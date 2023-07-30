@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include<qimage.h>
+#include<qpainter.h>
+#include<qcolor.h>
 extern "C" {
 #pragma comment (lib, "avcodec.lib")
 #pragma comment (lib, "avdevice.lib")
@@ -17,6 +20,7 @@ extern "C" {
 #include<libswscale/swscale.h>
 #include<libavutil/fifo.h>
 #include<libswresample/swresample.h>
+#include<libavutil/imgutils.h>
 }
 
 QT_BEGIN_NAMESPACE
@@ -30,6 +34,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    void paintEvent(QPaintEvent *event)override;
+
+    QImage Image;
+
+public slots:
+    void ct_update_image(QImage img);
 
 private:
     Ui::MainWindow *ui;

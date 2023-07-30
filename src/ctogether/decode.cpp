@@ -3,7 +3,7 @@
 #include"single_core.h"
 #include"av_queues.h"
 
-int ct_decode_video(single_core* core_ptr, av_queues* queues)
+int ct_decode::ct_decode_video(single_core* core_ptr, av_queues* queues)
 {
 	AVFrame* ptr_frame = av_frame_alloc();
 	AVPacket* ptr_packet = av_packet_alloc();
@@ -11,6 +11,10 @@ int ct_decode_video(single_core* core_ptr, av_queues* queues)
 	const AVCodec* codec_video;
 	AVCodecContext* codec_ctx_video;
 	std::unique_lock<std::mutex> lock(queues->video_packet_mutex);
+	SwsContext* ptr_ctx_sws = core_ptr->ptr_sws_ctx;
+	int image_size = 0;
+	uint8_t* ptr_imgbuffer;
+	AVFrame* ptr_frame_rgb32;
 
 	// start decoding
 	while (true)
@@ -38,9 +42,48 @@ int ct_decode_video(single_core* core_ptr, av_queues* queues)
 				break;
 			}
 
-			qDebug() << ptr_frame->linesize[1];
-			exit(-10);
 
+			ptr_frame_rgb32 = av_frame_alloc();
+			// converting to RGB32 picture
+			ptr_ctx_sws = sws_getContext(codec_ctx_video->width,
+												codec_ctx_video->height,
+												codec_ctx_video->pix_fmt,
+												 codec_ctx_video->width,
+												 codec_ctx_video->height,
+												 AV_PIX_FMT_RGB32,
+												 SWS_BICUBIC,nullptr,nullptr,nullptr);
+
+			image_size = av_image_get_buffer_size(AV_PIX_FMT_RGB32,
+																			 codec_ctx_video->width,
+																			 codec_ctx_video->height,
+																			 1);
+
+			// allocate memory for image buffer
+			ptr_imgbuffer = (uint8_t*)av_malloc(image_size);
+
+			av_image_fill_arrays(ptr_frame_rgb32->data,
+																	 ptr_frame_rgb32->linesize,
+																	 ptr_imgbuffer,
+																	 AV_PIX_FMT_RGB32,
+																	 codec_ctx_video->width,
+																	 codec_ctx_video->height,
+																	 1);
+			
+			sws_scale(ptr_ctx_sws,(uint8_t const*const *)ptr_frame->data,ptr_frame->linesize,
+								0,codec_ctx_video->height,ptr_frame_rgb32->data,ptr_frame_rgb32->linesize);
+
+			// until now the complete image showed up
+			QImage tmp_img(ptr_imgbuffer,
+												 codec_ctx_video->width,
+												 codec_ctx_video->height,
+												 QImage::Format_RGB32);
+			
+			QImage img = tmp_img.copy();
+
+			emit ct_image_decoded(img);
+
+			av_frame_free(&ptr_frame_rgb32);
+			av_free(ptr_imgbuffer);
 		}
 
 	}
@@ -57,7 +100,7 @@ _OUT:
 	return ret_num;
 }
 
-int ct_decode_audio(single_core* core_ptr, av_queues* queues)
+int ct_decode::ct_decode_audio(single_core* core_ptr, av_queues* queues)
 {
 	// mian loop
 	while (true)

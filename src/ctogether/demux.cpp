@@ -115,8 +115,8 @@ int ct_demux(single_core* core_ptr , av_queues* queues)
 			}
 
 			// set thread count
-			core_ptr->ptr_video_codec_ctx->thread_count = 8;
-			core_ptr->ptr_audio_codec_ctx->thread_count = 8;
+			core_ptr->ptr_video_codec_ctx->thread_count = std::thread::hardware_concurrency()/2;
+			core_ptr->ptr_audio_codec_ctx->thread_count = std::thread::hardware_concurrency() / 2;
 
 			if (core_ptr->ptr_VideoCodec->id == AV_CODEC_ID_H264)
 			{
