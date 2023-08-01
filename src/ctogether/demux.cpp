@@ -1,7 +1,7 @@
 #include"mainwindow.h"
 #include"single_core.h"
 #include"demux.h"
-#include"av_queues.h"
+
 
 /*
 * @author Grayson_Wang
@@ -146,33 +146,20 @@ int ct_demux(single_core* core_ptr , av_queues* queues)
 	{
 		if (ptr_packet->stream_index == idx_video_stream)
 		{
-			// if video packet's size > __MAX__QUEUE_LEN__ defined, then wait
-			while (queues->ct_is_queue_full(queues->video_packet_queue));
-
-			// push video packet into queue
-			queues->ct_queue_pshback_v(queues->video_packet_queue,ptr_packet);
-
-			// notify video thread to decode
-			queues->video_packet_cv.notify_all();
-			
+			// push it into video packet queue
+			queues->packet_queue[VIDEO]->ct_push_back(*ptr_packet);
+	
 			/*break;*/
 		}
 		else if (ptr_packet->stream_index == idx_audio_stream)
 		{
-			// if audio packet's size > __MAX__QUEUE_LEN__ defined, then wait
-			while (queues->ct_is_queue_full(queues->audio_packet_queue));
-
-			// push audio packet into queue
-			queues->ct_queue_pshback_a(queues->audio_packet_queue, ptr_packet);
-
-			// notify audio thread to decode
-			queues->audio_packet_cv.notify_all();
+			// push it into audio packet queue
+			queues->packet_queue[AUDIO]->ct_push_back(*ptr_packet);
 		}
 		// TODO: preserved for AVMEDIATYPE_SUBTITLE or so
 		//else if(){}
 		else
 		{
-
 			av_packet_unref(ptr_packet);
 		}
 	}

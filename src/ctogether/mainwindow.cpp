@@ -31,6 +31,8 @@ void MainWindow::paintEvent(QPaintEvent *event)
     // buttom color
     painter.drawRect(0, 0, this->width(), this->height());
 
+   // QImage Image = 
+
     // scale the image into mainwindow's size
     QImage image = Image.scaled(this->size(), Qt::KeepAspectRatio);
 
@@ -46,7 +48,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
 void MainWindow::ct_update_image(QImage img)
 {
-    Image = img;
+    Image = img.copy();
     update();
 }
 

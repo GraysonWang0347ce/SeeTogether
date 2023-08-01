@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 
 	/* TEST CODES HERE TO BE ARCHIVED*/
 	single_core* core_ptr = single_core::get_instance();
-	av_queues* queues = new av_queues();
+	static av_queues* queues = new av_queues();
 	auto decode = ct_decode();
 
 	std::thread demux(ct_demux,core_ptr,queues);
@@ -30,5 +30,7 @@ int main(int argc, char* argv[])
 
 	/* TEST CODES HERE TO BE ARCHIVED*/
 
+
+	delete queues;
 	return a.exec();
 }
