@@ -4,6 +4,7 @@
 
 #include<mutex>
 #include<condition_variable>
+#include<typeinfo>
 
 static std::mutex mutex;
 static std::condition_variable cv;
@@ -38,10 +39,9 @@ public:
 	inline uint64_t ct_size() const { return size; }
 
 	AVFifo* data;
-	uint64_t nb_data;
+	volatile uint64_t nb_data;
 	int64_t duration;
 	uint64_t size;
-
 
 };
 
@@ -92,6 +92,7 @@ int av_queue<T>::ct_push_back(T& element)
 {
 	int ret = 0;
 	T tmp = element;
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	std::unique_lock<std::mutex> lock(mutex);
 	ret = av_fifo_write(data, &tmp, 1);
 	lock.unlock();
@@ -102,6 +103,7 @@ int av_queue<T>::ct_push_back(T& element)
 		size += sizeof(element);
 		duration += element.duration ? element.duration : 0;
 		cv.notify_all();
+		qDebug() << typeid(element).name()<< " Packet size ++: " << nb_data;
 	}
 
 	return ret;
@@ -112,6 +114,7 @@ inline int av_queue<QImage>::ct_push_back(QImage& element)
 {
 	int ret = 0;
 	QImage tmp = element;
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	std::unique_lock<std::mutex> lock(mutex);
 	ret = av_fifo_write(data, &tmp, 1);
 	lock.unlock();
@@ -135,23 +138,32 @@ template<class T>
 T* av_queue<T>::ct_pop_front()
 {
 	int ret = 0;
-	while (nb_data == 0)
+	/*while (nb_data == 0)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	}*/
 	std::unique_lock<std::mutex> lock(mutex);
-	// while(nb_data == 0) { cv.wait(lock); }
+	while(nb_data == 0) 
+	{ 
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		cv.wait(lock); 
+	}
 	T element;
 
-	ret = av_fifo_read(data, &element, 1);
+	ret = av_fifo_read(data,(T*) & element, 1);
 	lock.unlock();
 	if (ret >= 0)
 	{
 		nb_data--;
 		size -= sizeof(element);
 		duration -= element.duration ? element.duration : 0;
-	}
+		cv.notify_all();
 
+		qDebug() << typeid(element).name() << " Packet size -- : " << nb_data;
+		
+	}
+	qDebug() << "POP_FRONT_RET £º£º" << ret;
+	exit(-10);
 	return &element;
 }
 
@@ -159,21 +171,25 @@ template<>
 inline QImage* av_queue<QImage>::ct_pop_front()
 {
 	int ret = 0;
-	while (nb_data == 0)
+	/*while (nb_data == 0)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	}*/
 	std::unique_lock<std::mutex> lock(mutex);
-	//while(nb_data == 0) { cv.wait(lock); }
+	while(nb_data == 0)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		cv.wait(lock);
+	}
 	QImage element;
 
-	lock.lock();
 	ret = av_fifo_read(data, &element, 1);
 	lock.unlock();
 	if (ret >= 0)
 	{
 		nb_data--;
 		size -= sizeof(element);
+		cv.notify_all();
 	}
 
 	return &element;

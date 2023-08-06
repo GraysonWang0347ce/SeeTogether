@@ -20,12 +20,11 @@ public:
 
     void paintEvent(QPaintEvent *event)override;
 
-    QImage Image;
-
 public slots:
     void ct_update_image(QImage img);
 
 private:
     Ui::MainWindow *ui;
+    QImage Image;
 };
 #endif // MAINWINDOW_H

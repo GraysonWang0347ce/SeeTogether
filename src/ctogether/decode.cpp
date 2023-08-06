@@ -61,7 +61,7 @@ int ct_decode::ct_decode_video(single_core* core_ptr, av_queues* queues)
 								0,core_ptr->ptr_video_codec_ctx->height,ptr_frame_rgb32->data,ptr_frame_rgb32->linesize);
 
 			// until now the complete image showed up
-			QImage tmp_img(ptr_imgbuffer,
+			QImage tmp_img((uint8_t*)ptr_imgbuffer,
 												 core_ptr->ptr_video_codec_ctx->width,
 												 core_ptr->ptr_video_codec_ctx->height,
 												 QImage::Format_RGB32);
