@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 
 	/* TEST CODES HERE TO BE ARCHIVED*/
 	single_core* core_ptr = single_core::get_instance();
-	static av_queues* queues = new av_queues();
+	av_queues* queues = new av_queues();
 	auto decode = ct_decode();
 
 	std::thread demux(ct_demux,core_ptr,queues);
@@ -24,13 +24,8 @@ int main(int argc, char* argv[])
 	demux.detach();
 	decode_video.detach();
 
-	
-
-	//avformat_free_context(ptr_fmt);
-
 	/* TEST CODES HERE TO BE ARCHIVED*/
 
 
-	delete queues;
 	return a.exec();
 }

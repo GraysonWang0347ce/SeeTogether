@@ -4,7 +4,8 @@
 
 #include"single_core.h"
 #include"av_queues.h"
-
+#include"ffmpeg_header.h"
+#include"mainwindow.h"
 
 class ct_decode:public QObject
 {

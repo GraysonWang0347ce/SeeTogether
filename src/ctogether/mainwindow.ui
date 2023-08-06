@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>SeeTogether</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="img.qrc">
+    <normaloff>:/icon/icon</normaloff>:/icon/icon</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -40,6 +44,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="img.qrc"/>
+ </resources>
  <connections/>
 </ui>

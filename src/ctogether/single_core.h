@@ -1,11 +1,11 @@
 #ifndef __SINGLE_CORE__
 #define __SINGLE_CORE__
 
-#include"mainwindow.h"
 #include<deque>
 #include<condition_variable>
 #include<mutex>
 #include"error.h"
+#include"ffmpeg_header.h"
 
 /*
 	Preprocessing

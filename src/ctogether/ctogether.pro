@@ -17,10 +17,12 @@ SOURCES += \
     single_core.cpp
 
 HEADERS += \
+    av_queue.hpp \
     av_queues.h \
     decode.h \
     demux.h \
     error.h \
+    ffmpeg_header.h \
     mainwindow.h \
     single_core.h
 
@@ -47,3 +49,6 @@ LIBS +=  -L$$FFMPEG_LIB \
         -lpostproc \
         -lswresample \
         -lswscale
+
+RESOURCES += \
+    img.qrc

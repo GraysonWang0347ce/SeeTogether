@@ -1,7 +1,4 @@
-#include"mainwindow.h"
-#include"single_core.h"
 #include"demux.h"
-
 
 /*
 * @author Grayson_Wang

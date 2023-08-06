@@ -2,7 +2,7 @@
 
 av_queues::av_queues()
 {
-	for (int i = 1; i < __NUM_PACKETS__; i++)
+	for (int i = 0; i < __NUM_PACKETS__; i++)
 	{
 		packet_queue[i] = new av_queue(AVPacket());
 	}
@@ -12,7 +12,7 @@ av_queues::av_queues()
 
 av_queues::~av_queues()
 {
-	for (int i = 1; i < __NUM_PACKETS__; i++)
+	for (int i = 0; i < __NUM_PACKETS__; i++)
 	{
 		packet_queue[i]->~av_queue();
 		delete packet_queue[i];

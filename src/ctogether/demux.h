@@ -1,9 +1,11 @@
 #pragma once
 #ifndef __DEMUX__
 #define __DEMUX__
-#include"mainwindow.h"
+
+#include"ffmpeg_header.h"
 #include"single_core.h"
 #include"av_queues.h"
+#include<qdebug.h>
 
 /*
 * @author Grayson_Wang
