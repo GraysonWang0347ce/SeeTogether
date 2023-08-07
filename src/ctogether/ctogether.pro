@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     av_queues.cpp \
+    control.cpp \
     decode.cpp \
     demux.cpp \
     main.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 HEADERS += \
     av_queue.hpp \
     av_queues.h \
+    control.h \
     decode.h \
     demux.h \
     error.h \

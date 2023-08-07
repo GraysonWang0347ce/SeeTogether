@@ -1,6 +1,6 @@
 #include "decode.h"
 
-int ct_decode::ct_decode_video(single_core* core_ptr, av_queues* queues)
+int ct_decode::ct_decode_video(single_core*& core_ptr, av_queues*& queues, ct_control* control)
 {
 	AVFrame* ptr_frame = av_frame_alloc();
 	AVPacket* ptr_packet = av_packet_alloc();
@@ -10,6 +10,8 @@ int ct_decode::ct_decode_video(single_core* core_ptr, av_queues* queues)
 	uint8_t* ptr_imgbuffer;
 	AVFrame* ptr_frame_rgb32;
 
+	control->wait_demux();
+
 	// start decoding
 	while (true)
 	{
@@ -18,7 +20,9 @@ int ct_decode::ct_decode_video(single_core* core_ptr, av_queues* queues)
 		// get video decoder(initialized at demux.cpp:81) 
 	//}
 
-		ptr_packet = queues->packet_queue[VIDEO]->ct_pop_front();
+
+		AVPacket temp = queues->packet_queue[VIDEO]->ct_pop_front();	
+		av_packet_move_ref(ptr_packet,&temp);
 		ret_num = avcodec_send_packet(core_ptr->ptr_video_codec_ctx,ptr_packet);
 	
 		while (ret_num>=0)
@@ -67,10 +71,11 @@ int ct_decode::ct_decode_video(single_core* core_ptr, av_queues* queues)
 												 QImage::Format_RGB32);
 			
 			QImage img = tmp_img.copy();
+			queues->image_queue->ct_push_back(tmp_img);
 
 			emit ct_image_decoded(img);
 
-			queues->image_queue->ct_push_back(img);
+
 
 			av_frame_free(&ptr_frame_rgb32);
 			av_free(ptr_imgbuffer);
@@ -90,7 +95,7 @@ _OUT:
 	return ret_num;
 }
 
-int ct_decode::ct_decode_audio(single_core* core_ptr, av_queues* queues)
+int ct_decode::ct_decode_audio(single_core* core_ptr, av_queues* queues , ct_control* control)
 {
 	// mian loop
 	while (true)

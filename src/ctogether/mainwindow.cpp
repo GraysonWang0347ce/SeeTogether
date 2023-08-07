@@ -34,6 +34,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
    // QImage Image = 
 
     // scale the image into mainwindow's size
+    //Image = queue->image_queue->ct_pop_front();
     QImage image = Image.scaled(this->size(), Qt::KeepAspectRatio);
 
     // center the image
@@ -48,7 +49,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
 void MainWindow::ct_update_image(QImage img)
 {
-    Image = img.copy();
+    Image = img;
     update();
 }
 

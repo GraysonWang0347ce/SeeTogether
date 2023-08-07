@@ -5,6 +5,7 @@
 #include<qimage.h>
 #include<qpainter.h>
 #include<qcolor.h>
+#include"av_queues.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

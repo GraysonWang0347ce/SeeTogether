@@ -2,9 +2,12 @@
 #ifndef __AV_QUEUE__
 #define __AV_QUEUE__
 
+#define __MAX__QUEUENUM__ 2000
+
 #include<mutex>
 #include<condition_variable>
 #include<typeinfo>
+#include<qdebug.h>
 
 static std::mutex mutex;
 static std::condition_variable cv;
@@ -26,7 +29,7 @@ public:
 	@brief pop the beginning element of the queue
 	@return reference to the beginning element , or nullptr if the queue is empty
 	*/
-	T* ct_pop_front();
+	T ct_pop_front();
 
 	/*
 	@brief peek the beginning element of the queue
@@ -38,48 +41,49 @@ public:
 	inline int64_t ct_duration() const { return duration; }
 	inline uint64_t ct_size() const { return size; }
 
+	// ffmpeg api implement of queue(bug)
 	AVFifo* data;
-	volatile uint64_t nb_data;
+
+	uint64_t nb_data;
 	int64_t duration;
 	uint64_t size;
+
+	// C++ std implement of queue
+	std::deque<T>* data_queue;
 
 };
 
 template<class T>
 av_queue<T>::av_queue(T tmp)
 {
-	data = av_fifo_alloc2(1, sizeof(T), AV_FIFO_FLAG_AUTO_GROW);
+#ifdef __USE_AVFIFO__
+	data = av_fifo_alloc2(1, sizeof(tmp), AV_FIFO_FLAG_AUTO_GROW);
+#endif // __USE_AVFIFO__
+
 	nb_data = 0;
 	duration = 0;
 	size = 0;
-	/*mutex = new std::mutex();
-	cv = new std::condition_variable();
-	lock = new std::unique_lock<std::mutex>(*mutex);*/
+	data_queue = new std::deque<T>();
 }
 
 template<class T>
 av_queue<T>::~av_queue()
 {
+#ifdef __USE_AVFIFO__
 	if (data)
 	{
 		av_fifo_freep2(&data);
 		data = nullptr;
 	}
-	/*if(mutex)
+#endif // __USE_AVFIFO__
+
+	if (data_queue)
 	{
-		delete mutex;
-		mutex = nullptr;
+		data_queue->clear();
+		delete data_queue;
+		data_queue = nullptr;
 	}
-	if(cv)
-	{
-		delete cv;
-		cv = nullptr;
-	}
-	if (lock)
-	{
-		delete lock;
-		lock = nullptr;
-	}*/
+
 }
 
 
@@ -87,24 +91,66 @@ av_queue<T>::~av_queue()
 	@brief to push a given element to the back of the queue
 	@return >=0 on success, another on error
 */
-template<class T>
-int av_queue<T>::ct_push_back(T& element)
+template<>
+inline int av_queue<AVPacket>::ct_push_back(AVPacket& element)
 {
 	int ret = 0;
-	T tmp = element;
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	std::unique_lock<std::mutex> lock(mutex);
-	ret = av_fifo_write(data, &tmp, 1);
-	lock.unlock();
+	AVPacket* tmp = av_packet_alloc();
+	av_packet_move_ref(tmp, &element);
 
-	if (ret >= 0)
+	//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	std::unique_lock<std::mutex> lock(mutex);
+	while (data_queue->size() >= __MAX__QUEUENUM__)
 	{
-		nb_data++;
-		size += sizeof(element);
-		duration += element.duration ? element.duration : 0;
-		cv.notify_all();
-		qDebug() << typeid(element).name()<< " Packet size ++: " << nb_data;
+		cv.wait(lock);
+}
+
+#ifdef __USE__AVFIFO__
+	ret = av_fifo_write(data, &tmp, 1);
+#endif // __USE__AVFIFO__
+
+	data_queue->push_back(*tmp);
+
+	nb_data++;
+	size += sizeof(element);
+	duration += element.duration ? element.duration : 0;
+
+	cv.notify_all();
+
+	// DEBUG
+	// qDebug() << typeid(element).name() << " Packet size ++: " << nb_data;
+	qDebug() << this->data_queue << "Data Queue Address :: ADDING";
+
+	return ret;
+}
+
+template<>
+inline int av_queue<AVFrame>::ct_push_back(AVFrame& element)
+{
+	int ret = 0;
+	AVFrame* tmp = av_frame_alloc();
+	av_frame_move_ref(tmp, &element);
+
+	//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	std::unique_lock<std::mutex> lock(mutex);
+	while (data_queue->size() >= __MAX__QUEUENUM__)
+	{
+		cv.wait(lock);
 	}
+#ifdef __USE__AVFIFO__
+	ret = av_fifo_write(data, &tmp, 1);
+#endif // __USE__AVFIFO__
+
+	data_queue->push_back(*tmp);
+
+	nb_data++;
+	size += sizeof(element);
+	duration += element.duration ? element.duration : 0;
+
+	cv.notify_all();
+
+	// DEBUG
+	// qDebug() << typeid(element).name() << " Packet size ++: " << nb_data;
 
 	return ret;
 }
@@ -114,10 +160,18 @@ inline int av_queue<QImage>::ct_push_back(QImage& element)
 {
 	int ret = 0;
 	QImage tmp = element;
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	std::unique_lock<std::mutex> lock(mutex);
+	while (data_queue->size() >= __MAX__QUEUENUM__)
+	{
+		cv.wait(lock);
+	}
+
+#ifdef __USE_AVFIFO__
 	ret = av_fifo_write(data, &tmp, 1);
-	lock.unlock();
+#endif // __USE_AVFIFO__
+
+	data_queue->push_back(tmp);
 
 	if (ret >= 0)
 	{
@@ -135,40 +189,45 @@ inline int av_queue<QImage>::ct_push_back(QImage& element)
 	@return pointer to the beginning element , or nullptr if the queue is empty
 */
 template<class T>
-T* av_queue<T>::ct_pop_front()
+T av_queue<T>::ct_pop_front()
 {
 	int ret = 0;
 	/*while (nb_data == 0)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}*/
+
+	// DEBUG
+	qDebug() << this->data_queue << "Data Queue Address :: POPPING";
+
 	std::unique_lock<std::mutex> lock(mutex);
-	while(nb_data == 0) 
-	{ 
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		cv.wait(lock); 
+	while (nb_data == 0 && data_queue->size() == 0)
+	{
+		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		cv.wait(lock);
 	}
 	T element;
 
-	ret = av_fifo_read(data,(T*) & element, 1);
-	lock.unlock();
-	if (ret >= 0)
-	{
-		nb_data--;
-		size -= sizeof(element);
-		duration -= element.duration ? element.duration : 0;
-		cv.notify_all();
+	// __USE_AVFIFO__
+	//ret = av_fifo_read(data, (T*)&element, 1);
 
-		qDebug() << typeid(element).name() << " Packet size -- : " << nb_data;
-		
-	}
+// __USE_STD__
+	element = data_queue->front();
+	data_queue->pop_front();
+
+	nb_data--;
+	size -= sizeof(element);
+	duration -= element.duration ? element.duration : 0;
+	cv.notify_all();
+
+	// DEBUG
+	qDebug() << typeid(element).name() << " Packet size -- : " << nb_data;
 	qDebug() << "POP_FRONT_RET £º£º" << ret;
-	exit(-10);
-	return &element;
+	return element;
 }
 
 template<>
-inline QImage* av_queue<QImage>::ct_pop_front()
+inline QImage av_queue<QImage>::ct_pop_front()
 {
 	int ret = 0;
 	/*while (nb_data == 0)
@@ -176,23 +235,25 @@ inline QImage* av_queue<QImage>::ct_pop_front()
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}*/
 	std::unique_lock<std::mutex> lock(mutex);
-	while(nb_data == 0)
+	while (nb_data == 0)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		cv.wait(lock);
 	}
 	QImage element;
 
-	ret = av_fifo_read(data, &element, 1);
-	lock.unlock();
-	if (ret >= 0)
-	{
-		nb_data--;
-		size -= sizeof(element);
-		cv.notify_all();
-	}
+	// __USE_AVFIFO__
+	// ret = av_fifo_read(data, &element, 1);
 
-	return &element;
+	// __USE_STD__
+	element = data_queue->front();
+	data_queue->pop_front();
+
+	nb_data--;
+	size -= sizeof(element);
+	cv.notify_all();
+
+	return element;
 }
 
 
@@ -203,13 +264,18 @@ inline QImage* av_queue<QImage>::ct_pop_front()
 template<class T>
 T& av_queue<T>::ct_peek_front()
 {
-	if (nb_data == 0) { return nullptr; }
+	if (nb_data == 0 && data_queue->size() == 0) { return nullptr; }
 	else
 	{
 		T element;
 		std::unique_lock<std::mutex> lock(mutex);
-		av_fifo_peek(data, &element, 1, 0);
-		lock.unlock();
+
+		// __USE_AVFIFO__
+		//av_fifo_peek(data, &element, 1, 0);
+
+		// __USE_STD__
+		element = data_queue->front();
+
 		return &element;
 	}
 }

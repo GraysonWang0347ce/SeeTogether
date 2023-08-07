@@ -6,6 +6,7 @@
 #include"av_queues.h"
 #include"ffmpeg_header.h"
 #include"mainwindow.h"
+#include"control.h"
 
 class ct_decode:public QObject
 {
@@ -19,9 +20,9 @@ public:
 	* @param core_ptr : a pointer to a single_core object
 	* @brief
 	*/
-	int ct_decode_video(single_core* core_ptr, av_queues* queues);
+	int ct_decode_video(single_core*& core_ptr, av_queues*& queues, ct_control* control);
 
-	int ct_decode_audio(single_core* core_ptr, av_queues* queues);
+	int ct_decode_audio(single_core* core_ptr, av_queues* queues, ct_control* control);
 
 signals:
         void ct_image_decoded(QImage ptr_image);

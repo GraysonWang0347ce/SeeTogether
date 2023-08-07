@@ -5,6 +5,7 @@
 #include"ffmpeg_header.h"
 #include"single_core.h"
 #include"av_queues.h"
+#include"control.h"
 #include<qdebug.h>
 
 /*
@@ -18,7 +19,7 @@
 		4. demuxing
 	@return 0 on success or enum CT_ERROR(in single_core.h)
 */
-extern int ct_demux(single_core* core_ptr, av_queues* queues);
+extern int ct_demux(single_core* core_ptr, av_queues* queues, ct_control* control);
 
 #endif // !__DEMUX__
 
