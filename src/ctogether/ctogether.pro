@@ -15,6 +15,7 @@ SOURCES += \
     demux.cpp \
     main.cpp \
     mainwindow.cpp \
+    player.cpp \
     single_core.cpp
 
 HEADERS += \
@@ -26,6 +27,7 @@ HEADERS += \
     error.h \
     ffmpeg_header.h \
     mainwindow.h \
+    player.h \
     single_core.h
 
 FORMS += \

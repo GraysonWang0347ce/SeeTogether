@@ -8,11 +8,16 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+   
+    ct_player* player = new ct_player();
 
-    ct_decode decoder = ct_decode();
-    
-    connect(&decoder,&ct_decode::ct_image_decoded,
-                        this,&MainWindow::ct_update_image);
+    connect(player, SIGNAL(ct_player_emit_image(QImage)),
+                         this, SLOT(ct_update_image(QImage)));
+
+    player->start();
+
+    // connect(&decoder,&ct_decode::ct_image_decoded,
+    //                  this,&MainWindow::ct_update_image);
 }
 
 MainWindow::~MainWindow()
@@ -24,27 +29,31 @@ void MainWindow::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     QBrush brush;
-    brush.setColor(QColor(33, 34, 35, 0));
+    brush.setColor(QColor(0x3, 0x47, 0xce, 255));
     brush.setStyle(Qt::SolidPattern);
     painter.setBrush(brush);
 
     // buttom color
     painter.drawRect(0, 0, this->width(), this->height());
 
-   // QImage Image = 
-
     // scale the image into mainwindow's size
-    //Image = queue->image_queue->ct_pop_front();
-    QImage image = Image.scaled(this->size(), Qt::KeepAspectRatio);
+    // Image = queue->image_queue->ct_pop_front();
+    // Image = QImage("D:\\Documents\\classInfoAssistant\\Ad\\icon.png");
+    
+    //QImage image =  Image.scaled(this->size(), Qt::KeepAspectRatio,Qt::SmoothTransformation);
+    
+    QSize size(Image.width(), Image.height());
+    this->resize(size);
 
     // center the image
-    int x = (this->width() - image.width()) / 2;
-    int y = (this->height() - image.height()) / 2;
+    int x = (this->width() - Image.width()) / 2;
+    int y = (this->height() - Image.height()) / 2;
 
     x /= 2; y /= 2;
 
-    painter.drawImage(QPoint(x, y), image);
-    qDebug()<<"DREW!!";
+    painter.drawImage(QPoint(x, y), Image);
+
+   // qDebug()<<"DREW!!";
 }
 
 void MainWindow::ct_update_image(QImage img)

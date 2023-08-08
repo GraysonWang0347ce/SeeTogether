@@ -119,7 +119,7 @@ inline int av_queue<AVPacket>::ct_push_back(AVPacket& element)
 
 	// DEBUG
 	// qDebug() << typeid(element).name() << " Packet size ++: " << nb_data;
-	qDebug() << this->data_queue << "Data Queue Address :: ADDING";
+	// qDebug() << this->data_queue << "Data Queue Address :: ADDING";
 
 	return ret;
 }
@@ -198,7 +198,7 @@ T av_queue<T>::ct_pop_front()
 	}*/
 
 	// DEBUG
-	qDebug() << this->data_queue << "Data Queue Address :: POPPING";
+	// qDebug() << this->data_queue << "Data Queue Address :: POPPING";
 
 	std::unique_lock<std::mutex> lock(mutex);
 	while (nb_data == 0 && data_queue->size() == 0)
@@ -221,8 +221,8 @@ T av_queue<T>::ct_pop_front()
 	cv.notify_all();
 
 	// DEBUG
-	qDebug() << typeid(element).name() << " Packet size -- : " << nb_data;
-	qDebug() << "POP_FRONT_RET £º£º" << ret;
+	// qDebug() << typeid(element).name() << " Packet size -- : " << nb_data;
+	// qDebug() << "POP_FRONT_RET £º£º" << ret;
 	return element;
 }
 

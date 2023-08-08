@@ -5,7 +5,9 @@
 #include<qimage.h>
 #include<qpainter.h>
 #include<qcolor.h>
-#include"av_queues.h"
+#include<QThread>
+#include"player.h"
+#include"decode.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,7 +21,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void paintEvent(QPaintEvent *event)override;
+protected:
+    void paintEvent(QPaintEvent *event);
 
 public slots:
     void ct_update_image(QImage img);
@@ -27,5 +30,6 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QImage Image;
+    ct_decode_video* decoder;
 };
 #endif // MAINWINDOW_H

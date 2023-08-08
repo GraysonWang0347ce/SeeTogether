@@ -10,7 +10,7 @@
 		video and audio
 		4. demuxing
 */
-int ct_demux(single_core* core_ptr , av_queues* queues, ct_control* control)
+void ct_demux::run()
 {
 	// TODO: to preserve multiple video&audio stream, use vector later
 	static int idx_video_stream = -1;
@@ -112,8 +112,8 @@ int ct_demux(single_core* core_ptr , av_queues* queues, ct_control* control)
 			}
 
 			// set thread count
-			//core_ptr->ptr_video_codec_ctx->thread_count = std::thread::hardware_concurrency()/2;
-			//core_ptr->ptr_audio_codec_ctx->thread_count = std::thread::hardware_concurrency() / 2;
+			core_ptr->ptr_video_codec_ctx->thread_count = std::thread::hardware_concurrency()/2;
+			core_ptr->ptr_audio_codec_ctx->thread_count = std::thread::hardware_concurrency() / 2;
 
 			if (core_ptr->ptr_VideoCodec->id == AV_CODEC_ID_H264)
 			{
@@ -175,5 +175,12 @@ int ct_demux(single_core* core_ptr , av_queues* queues, ct_control* control)
 	{
 		av_packet_free(&ptr_packet);
 	}
-	return ret_num;
+	return;
+}
+
+ct_demux::ct_demux(single_core* o_core_ptr, av_queues* o_queues, ct_control* o_controller)
+{
+	core_ptr = o_core_ptr;
+	queues = o_queues;
+	control = o_controller;
 }
