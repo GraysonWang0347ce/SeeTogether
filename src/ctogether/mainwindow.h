@@ -6,8 +6,8 @@
 #include<qpainter.h>
 #include<qcolor.h>
 #include<QThread>
-#include"player.h"
-#include"decode.h"
+
+class ct_player;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,6 +30,6 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QImage Image;
-    ct_decode_video* decoder;
+    ct_player* player;
 };
 #endif // MAINWINDOW_H

@@ -1,3 +1,11 @@
 ﻿  Generate moc_predefs.h
 C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(248,5): warning MSB8064: 项“debug\moc_predefs.h.cbt”的自定义生成成功，但指定的依赖项“e:\player\src\ctogether\debug\moc_predefs.h.cbt”不存在。这可能会导致增量生成无法正常工作。
+  demux.cpp
+E:\Player\src\ctogether\av_queue.hpp(1,1): warning C4828: 文件包含在偏移 0x1295 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+E:\Player\src\ctogether\av_queue.hpp(1,1): warning C4828: 文件包含在偏移 0x1296 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+E:\Player\src\ctogether\av_queue.hpp(1,1): warning C4828: 文件包含在偏移 0x1297 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+E:\Player\src\ctogether\av_queue.hpp(1,1): warning C4828: 文件包含在偏移 0x1298 处开始的字符，该字符在当前源字符集中无效(代码页 65001)。
+E:\Player\src\ctogether\av_queue.hpp(232,6): warning C4189: “ret”: 局部变量已初始化但不引用
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.36.32532\include\semaphore(17): warning STL4038: The contents of <semaphore> are available only with C++20 or later.
+demux.cpp(48,20): warning C4018: “<”: 有符号/无符号不匹配
   ctogether.vcxproj -> E:\Player\src\ctogether\debug\ctogether.exe

@@ -20,3 +20,17 @@ single_core* single_core::get_instance()
 	}
 		return ptr_this;
 }
+
+void single_core::delete_instance()
+{
+	if (ptr_this != nullptr)
+	{
+		if (ptr_FmtCtx)
+		{
+			avformat_free_context(ptr_FmtCtx);
+			ptr_FmtCtx = nullptr;
+		}
+		delete ptr_this;
+		ptr_this = nullptr;
+	}
+}

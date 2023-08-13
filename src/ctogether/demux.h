@@ -29,6 +29,9 @@ public:
 protected:
 	void run();
 
+signals:
+
+
 private:
 	single_core* core_ptr;
 	av_queues* queues;

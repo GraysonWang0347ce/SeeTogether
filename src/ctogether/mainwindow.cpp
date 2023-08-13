@@ -1,6 +1,6 @@
 #include "mainwindow.h"
+#include"player.h"
 #include "ui_mainwindow.h"
-#include"decode.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -9,20 +9,20 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
    
-    ct_player* player = new ct_player();
+    player = new ct_player();
 
     connect(player, SIGNAL(ct_player_emit_image(QImage)),
                          this, SLOT(ct_update_image(QImage)));
 
-    player->start();
+    //connect(player, SIGNAL(finished()),player, SLOT(deleteLater()));
 
-    // connect(&decoder,&ct_decode::ct_image_decoded,
-    //                  this,&MainWindow::ct_update_image);
+    player->start();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete player;
 }
 
 void MainWindow::paintEvent(QPaintEvent *event)
@@ -37,21 +37,23 @@ void MainWindow::paintEvent(QPaintEvent *event)
     painter.drawRect(0, 0, this->width(), this->height());
 
     // scale the image into mainwindow's size
-    // Image = queue->image_queue->ct_pop_front();
     // Image = QImage("D:\\Documents\\classInfoAssistant\\Ad\\icon.png");
     
-    //QImage image =  Image.scaled(this->size(), Qt::KeepAspectRatio,Qt::SmoothTransformation);
+    QImage image =  Image.scaled(this->size(), Qt::KeepAspectRatio,Qt::SmoothTransformation);
     
-    QSize size(Image.width(), Image.height());
-    this->resize(size);
+    // QSize size(Image.width(), Image.height());
+    // this->resize(size);
 
     // center the image
-    int x = (this->width() - Image.width()) / 2;
-    int y = (this->height() - Image.height()) / 2;
+    int x = (this->width() - image.width()) / 2;
+    int y = (this->height() - image.height()) / 2;
 
     x /= 2; y /= 2;
 
-    painter.drawImage(QPoint(x, y), Image);
+    if (!image.isNull())
+    {
+        painter.drawImage(QPoint(x, y), image);
+    }
 
    // qDebug()<<"DREW!!";
 }

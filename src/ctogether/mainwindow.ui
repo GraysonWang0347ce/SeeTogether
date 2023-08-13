@@ -14,8 +14,14 @@
    <string>SeeTogether</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="img.qrc">
+   <iconset theme="accessories-character-map" resource="img.qrc">
     <normaloff>:/icon/icon</normaloff>:/icon/icon</iconset>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>50</width>
+    <height>50</height>
+   </size>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label">

@@ -107,7 +107,7 @@ void ct_demux::run()
 																				core_ptr->ptr_stream_audio->codecpar);
 			if (ret < 0)
 			{
-				ret_num = VIDEOCODEC_PARAM_COPY_FAILED;
+				ret_num = AUDIOCODEC_PARAM_COPY_FAILED;
 				goto _OUT;
 			}
 
@@ -138,8 +138,6 @@ void ct_demux::run()
 			}
 	 // ABOVE are operates  initializing AVCodex-related data structures 
 
-		control->notify_demux();
-
 	// demuxing
 	while (!av_read_frame(ptr_fmt, ptr_packet))
 	{
@@ -147,13 +145,14 @@ void ct_demux::run()
 		{
 			// push it into video packet queue
 			queues->packet_queue[VIDEO]->ct_push_back(*ptr_packet);
-	
+			control->notify_demux();
 			/*break;*/
 		}
 		else if (ptr_packet->stream_index == idx_audio_stream)
 		{
 			// push it into audio packet queue
 			queues->packet_queue[AUDIO]->ct_push_back(*ptr_packet);
+			control->notify_demux_a();
 		}
 		// TODO: preserved for AVMEDIATYPE_SUBTITLE or so
 		//else if(){}
@@ -162,6 +161,15 @@ void ct_demux::run()
 			av_packet_unref(ptr_packet);
 		}
 	}
+
+	ptr_packet->data = nullptr; ptr_packet->size = 0;
+	queues->packet_queue[VIDEO]->ct_push_back(*ptr_packet);
+	queues->packet_queue[AUDIO]->ct_push_back(*ptr_packet);
+
+	// close input
+	avformat_close_input(&ptr_fmt);
+
+	goto _OUT;
 
 	/*
 		Garbage collection
@@ -175,6 +183,7 @@ void ct_demux::run()
 	{
 		av_packet_free(&ptr_packet);
 	}
+
 	return;
 }
 

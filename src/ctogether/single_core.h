@@ -19,6 +19,8 @@ class single_core
 public:
 	static single_core* get_instance();
 
+	void delete_instance();
+
 	// Copy constructor and assignment operator are deleted
 	single_core(single_core& other) = delete;
 	single_core& operator=(single_core& other) = delete;

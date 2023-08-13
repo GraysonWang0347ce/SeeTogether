@@ -1,21 +1,23 @@
 #pragma once
-#ifndef __DECODE__
-#define __DECODE__
+#ifndef __AUDIO_OUTPUT__
+#define __AUDIO_OUTPUT__
 
 #include"single_core.h"
 #include"av_queues.h"
 #include"ffmpeg_header.h"
 #include"control.h"
 #include<QThread>
+#include<qaudiooutput.h>
+#include<qaudioformat.h>
 
-// VIDEO DECODE THREAD
-class ct_decode_video:public QThread
+// AUDIO DECODE THREAD
+class ct_audio_output :public QThread
 {
 	Q_OBJECT
 
 public:
-	ct_decode_video(single_core* o_core_ptr, av_queues* o_queues, ct_control* o_controller);
-	~ct_decode_video() {};
+	ct_audio_output(single_core* o_core_ptr, av_queues* o_queues, ct_control* o_controller);
+	~ct_audio_output() {};
 
 	/*
 	* @author Grayson_Wang
@@ -26,7 +28,7 @@ protected:
 	void run();
 
 signals:
-        void ct_image_decoded(QImage image);
+	void ct_audio_decoded(QByteArray audio);
 
 private:
 	single_core* core_ptr;
@@ -34,4 +36,7 @@ private:
 	ct_control* control;
 };
 
-#endif // !__DECODE__
+#endif // !__AUDIO_OUTPUT__
+
+
+
